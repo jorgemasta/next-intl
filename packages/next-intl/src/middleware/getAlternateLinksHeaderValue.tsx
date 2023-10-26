@@ -12,6 +12,14 @@ function getAlternateEntry(url: string, locale: string) {
   return `<${url}>; rel="alternate"; hreflang="${locale}"`;
 }
 
+function prefixPathname(locale: string, pathname: string) {
+  if (pathname === '/') {
+    return `/${locale}`;
+  } else {
+    return `/${locale}${pathname}`;
+  }
+}
+
 /**
  * See https://developers.google.com/search/docs/specialty/international/localized-versions
  */
@@ -54,14 +62,6 @@ export default function getAlternateLinksHeaderValue<
   }
 
   const links = config.locales.flatMap((locale) => {
-    function prefixPathname(pathname: string) {
-      if (pathname === '/') {
-        return `/${locale}`;
-      } else {
-        return `/${locale}${pathname}`;
-      }
-    }
-
     let url: URL;
 
     if (config.domains) {
@@ -80,7 +80,7 @@ export default function getAlternateLinksHeaderValue<
           locale !== domainConfig.defaultLocale ||
           config.localePrefix === 'always'
         ) {
-          url.pathname = prefixPathname(url.pathname);
+          url.pathname = prefixPathname(locale, url.pathname);
         }
 
         return getAlternateEntry(url.toString(), locale);
@@ -94,7 +94,7 @@ export default function getAlternateLinksHeaderValue<
       }
 
       if (locale !== config.defaultLocale || config.localePrefix === 'always') {
-        pathname = prefixPathname(pathname);
+        pathname = prefixPathname(locale, pathname);
       }
       url = new URL(pathname, normalizedUrl);
     }
@@ -104,10 +104,14 @@ export default function getAlternateLinksHeaderValue<
 
   // Add x-default entry
   if (!config.domains) {
-    const url = new URL(
-      getLocalizedPathname(normalizedUrl.pathname, config.defaultLocale),
-      normalizedUrl
+    let pathname = getLocalizedPathname(
+      normalizedUrl.pathname,
+      config.defaultLocale
     );
+    if (config.localePrefix === 'always') {
+      pathname = prefixPathname(config.defaultLocale, pathname);
+    }
+    const url = new URL(pathname, normalizedUrl);
     links.push(getAlternateEntry(url.toString(), 'x-default'));
   } else {
     // For domain-based routing there is no reasonable x-default

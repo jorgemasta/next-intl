@@ -135,7 +135,7 @@ it('works for prefixed routing (always)', () => {
   ).toEqual([
     '<https://example.com/en>; rel="alternate"; hreflang="en"',
     '<https://example.com/es>; rel="alternate"; hreflang="es"',
-    '<https://example.com/>; rel="alternate"; hreflang="x-default"'
+    '<https://example.com/en>; rel="alternate"; hreflang="x-default"'
   ]);
 
   expect(
@@ -147,7 +147,7 @@ it('works for prefixed routing (always)', () => {
   ).toEqual([
     '<https://example.com/en/about>; rel="alternate"; hreflang="en"',
     '<https://example.com/es/about>; rel="alternate"; hreflang="es"',
-    '<https://example.com/about>; rel="alternate"; hreflang="x-default"'
+    '<https://example.com/en/about>; rel="alternate"; hreflang="x-default"'
   ]);
 });
 
